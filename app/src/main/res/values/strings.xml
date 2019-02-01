@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MyPhotoManager</string>
+    <string name="file_provider">com.envionsoftware.upworktest.fileprovider</string>
+    <string name="pictures">Pictures</string>
+    <string name="albums">Albums</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
