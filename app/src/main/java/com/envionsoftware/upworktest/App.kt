@@ -1,9 +1,17 @@
 package com.envionsoftware.upworktest
 
 import android.app.Application
+import android.content.Context
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import org.acra.ACRA
+import org.acra.annotation.AcraCore
+import org.acra.annotation.AcraMailSender
+import org.acra.data.StringFormat
 
+@AcraCore(buildConfigClass = BuildConfig::class,
+    reportFormat = StringFormat.JSON)
+@AcraMailSender(mailTo = "oreksha@envionsoftware.com", reportAsFile = true)
 class App: Application() {
     override fun onCreate() {
         super.onCreate()
@@ -16,5 +24,10 @@ class App: Application() {
             .build()
         Realm.getInstance(config)
         Realm.setDefaultConfiguration(config)
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+         ACRA.init(this)
     }
 }

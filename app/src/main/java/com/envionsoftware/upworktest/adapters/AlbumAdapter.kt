@@ -8,6 +8,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.envionsoftware.upworktest.R
 import com.envionsoftware.upworktest.models.AlbumModel
+import com.squareup.picasso.Picasso
+import java.io.File
 
 class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
 
@@ -19,6 +21,9 @@ class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
 
     var cameraClick: ((item: AlbumModel)-> Unit)? = null
     var plusClick: ((item: AlbumModel)->Unit)? =null
+    var itemClickListener: ((item: AlbumModel) -> Unit)? = null
+
+
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): AlbumVH {
         val view = LayoutInflater.from(p0.context).inflate(R.layout.album_layout, p0, false)
         return AlbumVH(view)
@@ -26,13 +31,29 @@ class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
 
     override fun getItemCount() = items.size
 
-    override fun onBindViewHolder(p0: AlbumVH, p1: Int) {
-        items[p1].fillView(p0)
-        p0.camera.setOnClickListener {
+    override fun onBindViewHolder(vh: AlbumVH, p1: Int) {
+
+        val item = items[p1]
+        if(item.pictures.isNotEmpty())
+            item.pictures.lastOrNull()?.let {
+                Picasso.get()
+                    .load(File(it.imageUri))
+                    .resize(100,100)
+                    .centerCrop()
+                    .into(vh.picture)
+            }
+        else {
+            vh.picture.visibility = View.GONE
+        }
+        vh.title.text = "${item.name} ${if(item.pictures.size > 0) "("+item.pictures.size+ ")" else "" }"
+        vh.itemView.setOnClickListener {
+            itemClickListener?.invoke(items[p1])
+        }
+        vh.camera.setOnClickListener {
             //items[p1].setAsLast()
             cameraClick?.invoke(items[p1])
         }
-        p0.plus.setOnClickListener {
+        vh.plus.setOnClickListener {
             plusClick?.invoke(items[p1])
         }
     }

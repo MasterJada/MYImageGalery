@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity(){
         fab.setOnClickListener { presenter.takePhoto() }
         presenter.attachView(this)
 
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

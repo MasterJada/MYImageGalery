@@ -1,12 +1,14 @@
 package com.envionsoftware.upworktest.fragments
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.envionsoftware.upworktest.AlbumActivity
 import com.envionsoftware.upworktest.MainActivity
 
 import com.envionsoftware.upworktest.R
@@ -46,6 +48,11 @@ class AlbumsFragment : Fragment() {
         adapter.plusClick = {item ->
             (activity as? MainActivity)?.getPresenter()?.addAlbum(item)
         }
+        adapter.itemClickListener ={ item ->
+            startActivity( Intent(context, AlbumActivity::class.java).apply {
+                 putExtra("album", item.name)
+             })
+        }
         albums.addChangeListener { res ->
             adapter.items = res
         }
@@ -63,6 +70,7 @@ class AlbumsFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        albums.removeAllChangeListeners()
         realm.close()
     }
 

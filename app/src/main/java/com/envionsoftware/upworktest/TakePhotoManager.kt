@@ -2,13 +2,11 @@ package com.envionsoftware.upworktest
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.util.Log
 import com.envionsoftware.upworktest.models.PicturesPicture
 import io.reactivex.subjects.PublishSubject
-import io.realm.Realm
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat

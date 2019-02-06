@@ -33,7 +33,7 @@ class MainModel {
     fun setupContext(activity: Activity) {
         context = activity
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
-        setupWifiFromNetwork()
+        setupWifi()
         setupCity()
     }
 
@@ -74,7 +74,9 @@ class MainModel {
             val info = cm.activeNetworkInfo
             if (info != null && info.isConnected) {
                 val ssid = info.extraInfo
-                wifiName = ssid.replace("\"", "")
+                if(ssid != null) {
+                    wifiName = ssid.replace("\"", "")
+                }
             }
         }
     }
@@ -82,7 +84,7 @@ class MainModel {
     fun setupCity() {
         if (ContextCompat.checkSelfPermission(
                 context!!,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
@@ -124,18 +126,13 @@ class MainModel {
         albumModel.lastUpdate = Date()
         albumModel.name = title
         Realm.getDefaultInstance().use {
+            it.beginTransaction()
             try {
-                if (parentAlbum != null) {
-                    it.beginTransaction()
-                    parentAlbum.subAlbums.add(albumModel)
-                    it.commitTransaction()
-                } else {
-                    it.beginTransaction()
-                    it.copyToRealm(albumModel)
-                    it.commitTransaction()
-                }
+                parentAlbum?.subAlbums?.add(albumModel) ?: it.copyToRealm(albumModel)
             } catch (e: RealmPrimaryKeyConstraintException) {
                 Toast.makeText(context, "Album already exist", Toast.LENGTH_SHORT).show()
+            }finally {
+                it.commitTransaction()
             }
 
         }

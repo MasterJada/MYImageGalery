@@ -6,6 +6,8 @@ import android.widget.ImageView
 import com.envionsoftware.upworktest.R
 import com.squareup.picasso.Picasso
 import io.realm.RealmObject
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import java.io.File
 import java.text.SimpleDateFormat
@@ -15,6 +17,8 @@ open class PicturesPicture: RealmObject(), IPictureModel {
     @PrimaryKey
     var imageUri: String? = null
     var date: Date? = Date()
+    @LinkingObjects("pictures")
+     val album: RealmResults<AlbumModel>? =null
 
     fun getDate(): String {
        return SimpleDateFormat("dd MMM", Locale.getDefault()).format(date)
