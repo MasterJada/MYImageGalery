@@ -107,6 +107,9 @@ class MainPresenter(val model: MainModel): SearchView.OnQueryTextListener, View.
         if (requestCode == 203 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             model.setupWifi()
         }
+        if (requestCode == 204 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            model.setupWifiFromNetwork()
+        }
     }
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
         //TakePhotoManager.instance.activityResult(requestCode, resultCode, data)

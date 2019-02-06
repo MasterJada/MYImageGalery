@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(){
 
 
     fun changeFragment(pos: Int) {
-        main_pager.setCurrentItem(1, true)
+        main_pager.setCurrentItem(pos, true)
     }
 
 

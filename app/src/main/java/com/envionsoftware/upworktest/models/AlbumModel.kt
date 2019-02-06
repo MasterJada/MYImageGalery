@@ -34,7 +34,7 @@ open class AlbumModel: RealmObject() {
     companion object {
         fun getLastAlbum(): AlbumModel?{
             Realm.getDefaultInstance().use {
-                return it.where<AlbumModel>().sort("lastUpdate").findAll().last()
+                return   it.where<AlbumModel>().sort("lastUpdate").findAll().lastOrNull()
             }
         }
 
