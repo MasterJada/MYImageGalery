@@ -36,6 +36,7 @@ class MainPresenter(val model: MainModel): SearchView.OnQueryTextListener, View.
 
     fun viewReady(){
         view?.let { model.setupContext(it) }
+
     }
 
 
@@ -112,7 +113,6 @@ class MainPresenter(val model: MainModel): SearchView.OnQueryTextListener, View.
         }
     }
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
-        //TakePhotoManager.instance.activityResult(requestCode, resultCode, data)
         photoManager.activityResult(requestCode, resultCode, data)
     }
 }

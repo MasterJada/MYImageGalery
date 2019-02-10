@@ -4,12 +4,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import com.envionsoftware.upworktest.R
 import com.envionsoftware.upworktest.models.AlbumModel
-import com.squareup.picasso.Picasso
-import java.io.File
 
 class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
 
@@ -34,36 +30,9 @@ class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
     override fun onBindViewHolder(vh: AlbumVH, p1: Int) {
 
         val item = items[p1]
-        if(item.pictures.isNotEmpty())
-            item.pictures.lastOrNull()?.let {
-                Picasso.get()
-                    .load(File(it.imageUri))
-                    .resize(100,100)
-                    .centerCrop()
-                    .into(vh.picture)
-            }
-        else {
-            vh.picture.visibility = View.GONE
-        }
-        vh.title.text = "${item.name} ${if(item.pictures.size > 0) "("+item.pictures.size+ ")" else "" }"
-        vh.itemView.setOnClickListener {
-            itemClickListener?.invoke(items[p1])
-        }
-        vh.camera.setOnClickListener {
-            //items[p1].setAsLast()
-            cameraClick?.invoke(items[p1])
-        }
-        vh.plus.setOnClickListener {
-            plusClick?.invoke(items[p1])
-        }
+        item.fillItem(vh.itemView, cameraClick, plusClick, itemClickListener)
     }
 
 
-    class AlbumVH(itemView: View) : RecyclerView.ViewHolder(itemView){
-        val picture: ImageView = itemView.findViewById(R.id.iv_pic)
-        val title: TextView = itemView.findViewById(R.id.tv_title)
-        val camera: View = itemView.findViewById(R.id.ib_camera)
-        val plus: View = itemView.findViewById(R.id.ib_plus)
-
-    }
+    class AlbumVH(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

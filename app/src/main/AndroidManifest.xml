@@ -26,6 +26,9 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".DetailedActivity"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
         <activity android:name=".AlbumActivity">
         </activity>
         <activity android:name=".MainActivity">

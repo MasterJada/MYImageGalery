@@ -16,10 +16,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(){
 
 
-
-
-
-
     private val model = MainModel()
     private val presenter = MainPresenter(model)
 
@@ -61,6 +57,8 @@ class MainActivity : AppCompatActivity(){
 
     }
 
+
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.search, menu)
         menu?.findItem(R.id.search_bar)?.let {menuItem ->
@@ -69,7 +67,6 @@ class MainActivity : AppCompatActivity(){
             searchView.setOnQueryTextListener(presenter)
             }
         }
-
         return true
     }
 
@@ -80,6 +77,7 @@ class MainActivity : AppCompatActivity(){
     override fun onStart() {
         super.onStart()
         presenter.viewReady()
+
     }
 
 

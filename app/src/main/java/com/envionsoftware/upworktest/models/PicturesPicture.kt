@@ -3,13 +3,12 @@ package com.envionsoftware.upworktest.models
 
 import android.view.View
 import android.widget.ImageView
+import com.bumptech.glide.Glide
 import com.envionsoftware.upworktest.R
-import com.squareup.picasso.Picasso
 import io.realm.RealmObject
 import io.realm.RealmResults
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,7 +29,7 @@ open class PicturesPicture: RealmObject(), IPictureModel {
     override fun fillItem(v: View) {
         val image = v.findViewById<ImageView>(R.id.iv_picture)
        if(!imageUri.isNullOrBlank()) {
-           Picasso.get().load(File(imageUri)).resize(100,100).centerCrop().into(image)
+           Glide.with(v).load(imageUri).into(image)
         }
     }
     override fun collSpan(): Int {

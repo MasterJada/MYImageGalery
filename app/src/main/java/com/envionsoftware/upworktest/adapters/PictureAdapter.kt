@@ -4,8 +4,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import com.envionsoftware.upworktest.models.IPictureModel
+import com.envionsoftware.upworktest.models.PicturesPicture
 
 class PictureAdapter: RecyclerView.Adapter<PictureAdapter.PicturesVH>() {
     var items: List<IPictureModel> = ArrayList()
@@ -13,6 +13,8 @@ class PictureAdapter: RecyclerView.Adapter<PictureAdapter.PicturesVH>() {
             field = value
             notifyDataSetChanged()
         }
+
+    var onItemClick: ((item: PicturesPicture, view : View) -> Unit)? = null
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): PicturesVH {
         val view = LayoutInflater.from(p0.context).inflate(p1, p0, false)
@@ -23,6 +25,11 @@ class PictureAdapter: RecyclerView.Adapter<PictureAdapter.PicturesVH>() {
 
     override fun onBindViewHolder(vh: PicturesVH, p1: Int) {
         items[p1].fillItem(vh.itemView)
+        vh.itemView.setOnClickListener {
+            (items[p1] as? PicturesPicture)?.let {pic ->
+                onItemClick?.invoke(pic, it)
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {

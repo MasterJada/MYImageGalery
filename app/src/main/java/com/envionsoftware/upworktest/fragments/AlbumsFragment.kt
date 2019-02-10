@@ -33,7 +33,7 @@ class AlbumsFragment : Fragment() {
     }
 
     private val realm = Realm.getDefaultInstance()
-    private val albums = realm.where<AlbumModel>().sort("name", Sort.ASCENDING).findAll()
+    private val albums = realm.where<AlbumModel>().sort("name", Sort.ASCENDING).isEmpty("parent").findAll()
     private val disposables = ArrayList<Disposable>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

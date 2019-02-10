@@ -1,12 +1,26 @@
 package com.envionsoftware.upworktest.fragments
 
 
+import android.app.ActionBar
+import android.app.Activity
+import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.envionsoftware.upworktest.DetailedActivity
 import com.envionsoftware.upworktest.R
 import com.envionsoftware.upworktest.adapters.PictureAdapter
 import com.envionsoftware.upworktest.models.AlbumModel
@@ -25,15 +39,24 @@ class PicturesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val album = arguments?.getString("albumName")
-        if(album == null)
-            result = realm.where<PicturesPicture>().findAll()
-        else
-            result = realm.where<PicturesPicture>().equalTo("album.name", album).findAll()
+        result = if (album == null)
+            realm.where<PicturesPicture>().findAll()
+        else {
+            val query = realm.where<PicturesPicture>().equalTo("album.name", album)
+            realm.where<AlbumModel>().equalTo("name", album).findFirst()?.let { parent ->
+                parent.subAlbums.forEach { subAlbum ->
+                    query.or().equalTo("album.name", subAlbum.name)
+                }
+            }
+
+            // result = realm.where<PicturesPicture>().equalTo("album.name", album).findAll()
+            query.findAll()
+        }
 
         return inflater.inflate(R.layout.fragment_pictures, container, false)
     }
 
-    val realm = Realm.getDefaultInstance()
+    val realm: Realm = Realm.getDefaultInstance()
 
     private lateinit var result: RealmResults<PicturesPicture>
 
@@ -41,27 +64,27 @@ class PicturesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val layoutManager = GridLayoutManager(context, 6)
         val adapter = PictureAdapter()
-
-
-
-
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return adapter.items[position].collSpan()
             }
-
         }
         rv_pictures.layoutManager = layoutManager
         rv_pictures.adapter = adapter
-
-
         adapter.items = transform(result)
-
-        result?.addChangeListener { res ->
+        adapter.onItemClick =  {item, view ->
+            val  options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity as Activity, view, "picture")
+          startActivity(Intent(context, DetailedActivity::class.java).apply {
+              putExtra("image", item.imageUri)
+          }, options.toBundle())
+        }
+        result.addChangeListener { res ->
             adapter.items = transform(res)
         }
 
     }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -73,8 +96,7 @@ class PicturesFragment : Fragment() {
         val output = ArrayList<IPictureModel>()
         input.groupBy {
             it.getDate()
-        }
-            .forEach {
+        }.forEach {
                 output.add(PicturesHeader(it.key))
                 output.addAll(it.value)
             }
@@ -83,10 +105,10 @@ class PicturesFragment : Fragment() {
 
     companion object {
 
-        fun getInstance(albumName: String? = null): PicturesFragment{
+        fun getInstance(albumName: String? = null): PicturesFragment {
             val args = Bundle()
-            if(albumName != null)
-            args.putString("albumName", albumName)
+            if (albumName != null)
+                args.putString("albumName", albumName)
             val fragment = PicturesFragment()
             fragment.arguments = args
             return fragment

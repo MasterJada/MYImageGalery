@@ -2,6 +2,8 @@ package com.envionsoftware.upworktest
 
 import android.app.Application
 import android.content.Context
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.acra.ACRA
@@ -12,6 +14,7 @@ import org.acra.data.StringFormat
 @AcraCore(buildConfigClass = BuildConfig::class,
     reportFormat = StringFormat.JSON)
 @AcraMailSender(mailTo = "oreksha@envionsoftware.com", reportAsFile = true)
+@GlideModule
 class App: Application() {
     override fun onCreate() {
         super.onCreate()

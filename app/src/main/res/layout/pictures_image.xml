@@ -3,7 +3,9 @@
            xmlns:tools="http://schemas.android.com/tools"
            android:layout_width="match_parent"
            android:layout_height="64dp"
+           android:transitionName="picture"
            android:id="@+id/iv_picture"
-           tools:srcCompat="@tools:sample/avatars" android:scaleType="centerCrop">
+           tools:srcCompat="@tools:sample/avatars"
+           android:scaleType="centerCrop">
 
 </ImageView>

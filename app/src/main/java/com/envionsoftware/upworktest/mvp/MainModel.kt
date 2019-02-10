@@ -13,12 +13,12 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import com.envionsoftware.upworktest.models.AlbumModel
 import com.envionsoftware.upworktest.models.PicturesPicture
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import io.realm.Realm
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import java.lang.Exception
@@ -93,6 +93,27 @@ class MainModel {
                 202
             )
         } else {
+            val locationRequest = LocationRequest.create()?.apply {
+                interval = 200
+                fastestInterval = 20
+            }
+
+            fusedLocationClient.requestLocationUpdates(locationRequest, object: LocationCallback(){
+                override fun onLocationResult(locations: LocationResult?) {
+                    locations?.locations?.lastOrNull()?.let {location ->
+                        val coder = Geocoder(context)
+                        val result = coder.getFromLocation(location.latitude, location.longitude, 1)
+                        if (result.size > 0)
+                            city = result[0].locality
+                        print(city)
+
+                    }
+
+
+                }
+            }, context?.mainLooper)
+
+            if(city.isNullOrEmpty())
             fusedLocationClient.lastLocation.addOnSuccessListener {
                 it?.let { location ->
                     val coder = Geocoder(context)
