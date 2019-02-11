@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.envionsoftware.upworktest.R
 import com.envionsoftware.upworktest.models.AlbumModel
 
+
 class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
 
     var items: List<AlbumModel> = ArrayList()
@@ -15,9 +16,11 @@ class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
         notifyDataSetChanged()
     }
 
+
     var cameraClick: ((item: AlbumModel)-> Unit)? = null
     var plusClick: ((item: AlbumModel)->Unit)? =null
     var itemClickListener: ((item: AlbumModel) -> Unit)? = null
+
 
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): AlbumVH {
@@ -28,9 +31,8 @@ class AlbumAdapter: RecyclerView.Adapter<AlbumAdapter.AlbumVH>() {
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(vh: AlbumVH, p1: Int) {
-
         val item = items[p1]
-        item.fillItem(vh.itemView, cameraClick, plusClick, itemClickListener)
+        item.fillItem( vh.itemView, cameraClick, plusClick, itemClickListener)
     }
 
 

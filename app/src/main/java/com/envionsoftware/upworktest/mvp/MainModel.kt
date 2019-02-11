@@ -21,6 +21,7 @@ import com.envionsoftware.upworktest.models.PicturesPicture
 import com.google.android.gms.location.*
 import io.realm.Realm
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
+import io.realm.kotlin.where
 import java.lang.Exception
 import java.util.*
 
@@ -74,7 +75,7 @@ class MainModel {
             val info = cm.activeNetworkInfo
             if (info != null && info.isConnected) {
                 val ssid = info.extraInfo
-                if(ssid != null) {
+                if(ssid != null && !ssid.contains("unknown ssid")) {
                     wifiName = ssid.replace("\"", "")
                 }
             }
@@ -125,10 +126,15 @@ class MainModel {
 
         }
     }
+    fun getLastAlbum(): AlbumModel?{
+        Realm.getDefaultInstance().use {
+            return   it.where<AlbumModel>().sort("lastUpdate").findAll().lastOrNull()
+        }
+    }
 
     fun savePhoto(photo: PicturesPicture, album: AlbumModel? = null) {
         Realm.getDefaultInstance().use {
-            val lastAlbum = album ?: AlbumModel.getLastAlbum()
+            val lastAlbum = album ?: getLastAlbum()
             if (lastAlbum != null) {
                 it.beginTransaction()
                 lastAlbum.pictures.add(photo)
@@ -149,7 +155,12 @@ class MainModel {
         Realm.getDefaultInstance().use {
             it.beginTransaction()
             try {
+                val itm = it.where<AlbumModel>().equalTo("name", title).findFirst()
+                if(itm == null)
                 parentAlbum?.subAlbums?.add(albumModel) ?: it.copyToRealm(albumModel)
+                else
+                    Toast.makeText(context, "Album already exist", Toast.LENGTH_SHORT).show()
+
             } catch (e: RealmPrimaryKeyConstraintException) {
                 Toast.makeText(context, "Album already exist", Toast.LENGTH_SHORT).show()
             }finally {

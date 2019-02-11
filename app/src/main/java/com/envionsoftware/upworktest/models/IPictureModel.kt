@@ -1,6 +1,6 @@
 package com.envionsoftware.upworktest.models
 
-import android.graphics.Bitmap
+
 import android.view.View
 
 interface IPictureModel {

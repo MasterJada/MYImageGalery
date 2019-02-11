@@ -42,6 +42,7 @@ class AlbumsFragment : Fragment() {
         rv_albums.adapter = adapter
         rv_albums.layoutManager = LinearLayoutManager(context)
         adapter.items = albums
+
         adapter.cameraClick = {item ->
             (activity as? MainActivity)?.getPresenter()?.takePhoto(item)
         }
@@ -55,14 +56,22 @@ class AlbumsFragment : Fragment() {
         }
         albums.addChangeListener { res ->
             adapter.items = res
+
         }
        disposables.add ((activity as MainActivity).getPresenter().queryPublisher.distinctUntilChanged()
             .subscribe({query ->
-                adapter.items =  albums.where().contains("name", query,Case.INSENSITIVE).findAll()
+                adapter.items =  albums.where()
+                    .sort("name", Sort.ASCENDING)
+                    .contains("name", query,Case.INSENSITIVE)
+                    .or()
+                    .contains("subAlbums.name", query, Case.INSENSITIVE)
+                    .findAll()
+
             }, {
                 it.printStackTrace()
             }, {
                 adapter.items = albums
+
                 disposables.forEach { it.dispose() }
             }))
     }

@@ -26,7 +26,7 @@ open class AlbumModel: RealmObject() {
     @LinkingObjects("subAlbums")
     val parent: RealmResults<AlbumModel>? =null
 
-    fun fillItem(
+    open fun fillItem(
         v: View,
         cameraClick: ((item: AlbumModel) -> Unit)? = null,
         plusClick: ((item: AlbumModel) -> Unit)? = null,
@@ -65,13 +65,6 @@ open class AlbumModel: RealmObject() {
         }
     }
 
-    companion object {
-        fun getLastAlbum(): AlbumModel?{
-            Realm.getDefaultInstance().use {
-                return   it.where<AlbumModel>().sort("lastUpdate").findAll().lastOrNull()
-            }
-        }
 
-    }
 
 }
