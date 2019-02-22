@@ -6,19 +6,21 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+
 import android.net.ConnectivityManager
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
+import com.envionsoftware.upworktest.managers.LocationManager
+import com.envionsoftware.upworktest.managers.PermissionManager
 import com.envionsoftware.upworktest.models.AlbumModel
 import com.envionsoftware.upworktest.models.PicturesPicture
-import com.google.android.gms.location.*
 import io.realm.Realm
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import io.realm.kotlin.where
@@ -28,14 +30,13 @@ import java.util.*
 class MainModel {
     var wifiName: String? = null
     var city: String? = null
-    private var context: Activity? = null
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var context: AppCompatActivity? = null
+    private var permissionManager: PermissionManager? = null
 
-    fun setupContext(activity: Activity) {
+    fun setupContext(activity: AppCompatActivity) {
         context = activity
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
-        setupWifi()
         setupCity()
+        setupWifi()
     }
 
     fun setupWifi() {
@@ -51,13 +52,19 @@ class MainModel {
                 203
             )
         } else {
+
             val wifiMgr = context?.applicationContext?.getSystemService(Context.WIFI_SERVICE) as WifiManager
             val wifiInfo = wifiMgr.connectionInfo
-            wifiName = wifiInfo.ssid.replace("\"", "")
+            val ssid = wifiInfo.ssid
+            if(ssid != null && !ssid.contains("unknown ssid")) {
+                wifiName = ssid.replace("\"", "")
+            }
         }
     }
 
-
+    fun setupPermissionManager(permissionManager: PermissionManager) {
+        this.permissionManager = permissionManager
+    }
     fun setupWifiFromNetwork() {
         context ?: return
         if (ContextCompat.checkSelfPermission(
@@ -83,47 +90,17 @@ class MainModel {
     }
 
     fun setupCity() {
-        if (ContextCompat.checkSelfPermission(
-                context!!,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                context!!,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                202
-            )
-        } else {
-            val locationRequest = LocationRequest.create()?.apply {
-                interval = 200
-                fastestInterval = 20
-            }
-
-            fusedLocationClient.requestLocationUpdates(locationRequest, object: LocationCallback(){
-                override fun onLocationResult(locations: LocationResult?) {
-                    locations?.locations?.lastOrNull()?.let {location ->
-                        val coder = Geocoder(context)
-                        val result = coder.getFromLocation(location.latitude, location.longitude, 1)
-                        if (result.size > 0)
-                            city = result[0].locality
-                        print(city)
-
-                    }
-
-
-                }
-            }, context?.mainLooper)
-
-            if(city.isNullOrEmpty())
-            fusedLocationClient.lastLocation.addOnSuccessListener {
-                it?.let { location ->
+        if(context == null || permissionManager == null) return
+        LocationManager(context!!, permissionManager!!).apply {
+            onLocationUpdated {
+                if(it.isNotEmpty()){
                     val coder = Geocoder(context)
-                    val result = coder.getFromLocation(location.latitude, location.longitude, 1)
-                    if (result.size > 0)
-                        city = result[0].locality
+                   coder.getFromLocation(it[0].latitude, it[0].longitude, 1)?.firstOrNull()?.let {adress ->
+                      city = adress.locality
+                   }
+
                 }
             }
-
         }
     }
     fun getLastAlbum(): AlbumModel?{
@@ -148,25 +125,31 @@ class MainModel {
         }
     }
 
-    fun createAlbum(title: String, parentAlbum: AlbumModel? = null) {
+    fun createAlbum(title: String, parentAlbum: AlbumModel? = null): AlbumModel {
         val albumModel = AlbumModel()
         albumModel.lastUpdate = Date()
         albumModel.name = title
         Realm.getDefaultInstance().use {
             it.beginTransaction()
             try {
+                Log.e("test", "try")
                 val itm = it.where<AlbumModel>().equalTo("name", title).findFirst()
                 if(itm == null)
-                parentAlbum?.subAlbums?.add(albumModel) ?: it.copyToRealm(albumModel)
+                parentAlbum?.subAlbums?.add(albumModel) ?: return it.copyToRealm(albumModel)
                 else
                     Toast.makeText(context, "Album already exist", Toast.LENGTH_SHORT).show()
 
             } catch (e: RealmPrimaryKeyConstraintException) {
+                Log.e("test", "catch")
                 Toast.makeText(context, "Album already exist", Toast.LENGTH_SHORT).show()
             }finally {
+                Log.e("test", "finamly")
                 it.commitTransaction()
             }
 
         }
+        return albumModel
     }
+
+
 }

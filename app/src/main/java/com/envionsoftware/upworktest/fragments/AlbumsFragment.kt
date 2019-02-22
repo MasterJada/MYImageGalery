@@ -1,14 +1,17 @@
 package com.envionsoftware.upworktest.fragments
 
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.envionsoftware.upworktest.AlbumActivity
+import com.envionsoftware.upworktest.DnGActivity
 import com.envionsoftware.upworktest.MainActivity
 
 import com.envionsoftware.upworktest.R
@@ -54,6 +57,21 @@ class AlbumsFragment : Fragment() {
                  putExtra("album", item.name)
              })
         }
+        adapter.albumsChoosed = {albums ->
+           context?.let {
+               AlertDialog.Builder(context!!)
+                   .setTitle("Start editing chosed albums?")
+                   .setPositiveButton("Yes") { dialog, which ->
+                       dialog.dismiss()
+                       startEditActivity(albums)
+                       adapter.removeSelection()
+                   }.setNegativeButton("No") { dialog, which ->
+                       dialog.dismiss()
+                       adapter.removeSelection()
+                   }.show()
+
+           }
+        }
         albums.addChangeListener { res ->
             adapter.items = res
 
@@ -71,11 +89,16 @@ class AlbumsFragment : Fragment() {
                 it.printStackTrace()
             }, {
                 adapter.items = albums
-
                 disposables.forEach { it.dispose() }
             }))
     }
 
+    private fun startEditActivity(array: Array<String>){
+        Intent(context, DnGActivity::class.java).apply {
+            putExtra("albums", array)
+            startActivity(this)
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()

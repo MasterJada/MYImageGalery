@@ -1,4 +1,4 @@
-package com.envionsoftware.upworktest
+package com.envionsoftware.upworktest.managers
 
 import android.app.Activity
 import android.content.Intent
@@ -55,10 +55,15 @@ class TakePhotoManager {
     fun activityResult(requestCode: Int, resultCode: Int, data: Intent?){
         if(requestCode == 101 && resultCode == Activity.RESULT_OK && mPhotoPath.isNotEmpty()){
             Log.e("Image", "saved")
-            val picture = PicturesPicture()
-            picture.imageUri = mPhotoPath
-           if(mPhotoPath.isNotEmpty()){
-               publisher.onNext(picture)
+            val file = File(mPhotoPath)
+           if(file.exists() && file.length() > 0) {
+               val picture = PicturesPicture()
+               picture.imageUri = mPhotoPath
+               if (mPhotoPath.isNotEmpty()) {
+                   publisher.onNext(picture)
+               }
+           }else{
+               file.delete()
            }
 
         }

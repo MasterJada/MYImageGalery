@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import com.envionsoftware.upworktest.adapters.MainPagerAdapter
+import com.envionsoftware.upworktest.managers.PermissionManager
 import com.envionsoftware.upworktest.mvp.MainModel
 import com.envionsoftware.upworktest.mvp.MainPresenter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -19,6 +20,8 @@ class MainActivity : AppCompatActivity(){
     private val model = MainModel()
     private val presenter = MainPresenter(model)
 
+    private var shouldOpenCamera = false
+    private var shouldShowAlbums = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,10 +57,29 @@ class MainActivity : AppCompatActivity(){
         fab.setOnClickListener { presenter.takePhoto() }
         presenter.attachView(this)
 
+        if(intent?.extras?.containsKey("open_camera") == true){
+            intent.removeExtra("open_camera")
+            shouldOpenCamera = true
+        }
+        if(intent?.extras?.containsKey("open_albums") == true){
+            intent.removeExtra("open_albums")
+            shouldShowAlbums = true
+        }
 
     }
 
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if(intent?.extras?.containsKey("open_camera") == true){
+            intent.removeExtra("open_camera")
+            shouldOpenCamera = true
+        }
+        if(intent?.extras?.containsKey("open_albums") == true){
+            intent.removeExtra("open_albums")
+            shouldShowAlbums = true
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.search, menu)
@@ -80,6 +102,17 @@ class MainActivity : AppCompatActivity(){
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(shouldOpenCamera){
+            shouldOpenCamera = false
+            presenter.takePhoto()
+        }
+        if(shouldShowAlbums){
+            shouldShowAlbums = false
+            main_pager.currentItem = 1
+        }
+    }
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
